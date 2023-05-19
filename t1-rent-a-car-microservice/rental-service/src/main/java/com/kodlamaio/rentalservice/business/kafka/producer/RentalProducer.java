@@ -1,4 +1,4 @@
-package com.kodlamaio.rentalservice.business.kafka;
+package com.kodlamaio.rentalservice.business.kafka.producer;
 
 import com.kodlamaio.commonpackage.events.rental.RentalCreatedEvent;
 import lombok.RequiredArgsConstructor;

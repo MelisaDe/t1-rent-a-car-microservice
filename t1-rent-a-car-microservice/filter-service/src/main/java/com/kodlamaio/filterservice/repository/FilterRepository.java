@@ -9,4 +9,5 @@ public interface FilterRepository extends MongoRepository<Filter, UUID> {
     void deleteByCarId(UUID carId);
     void deleteAllByBrandId(UUID brandId);
     void deleteAllByModelId(UUID modelId);
+    Filter findByCarId(UUID carId);
 }

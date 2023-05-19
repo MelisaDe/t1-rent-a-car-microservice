@@ -17,7 +17,7 @@ import java.util.UUID;
 @Table(name = "rentals")
 public class Rental {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     private UUID carId;
     private double dailyPrice;

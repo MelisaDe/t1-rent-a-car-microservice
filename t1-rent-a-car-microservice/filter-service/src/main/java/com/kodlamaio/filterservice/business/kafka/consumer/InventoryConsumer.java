@@ -24,7 +24,7 @@ public class InventoryConsumer {
             groupId = "car-create"
     )
     public void consume(CarCreatedEvent event) {
-        var filter = mapper.forResponse().map(event, Filter.class);
+        var filter = mapper.forRequest().map(event, Filter.class);
         service.add(filter);
         log.info("Car created event consumed {}", event);
     }
@@ -46,7 +46,6 @@ public class InventoryConsumer {
         service.deleteAllByBrandId(event.getBrandId());
         log.info("Brand deleted event consumed {}", event);
     }
-
     @KafkaListener(topics = "model-deleted", groupId = "model-delete")
     public void consume(ModelDeletedEvent event){
         service.deleteAllByModelId(event.getModelId());

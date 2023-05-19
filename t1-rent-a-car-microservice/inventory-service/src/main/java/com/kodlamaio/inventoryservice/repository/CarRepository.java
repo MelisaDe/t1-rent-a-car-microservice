@@ -15,6 +15,6 @@ public interface CarRepository extends JpaRepository<Car, UUID> {
     boolean existsByPlateIgnoreCase(String plate);
     @Modifying
     @Transactional
-    @Query(value="update Car set state =:state where id =:id") //sPQL
+    @Query(value="update Car set state =:state where id =:id") //SPel
     void changeStateByCarId(State state, UUID id);
 }

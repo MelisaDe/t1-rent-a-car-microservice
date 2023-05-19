@@ -37,7 +37,6 @@ public class FilterManager implements FilterService {
 
     @Override
     public void add(Filter filter) {
-        filter.setId(UUID.randomUUID()); //otomatik id oluşturma olmadığı için burada id oluşturuyoruz
         repository.save(filter);
     }
 
@@ -59,5 +58,10 @@ public class FilterManager implements FilterService {
     @Override
     public void deleteByCarId(UUID carId) {
         repository.deleteByCarId(carId);
+    }
+
+    @Override
+    public Filter getByCarId(UUID carId) {
+        return repository.findByCarId(carId);
     }
 }
