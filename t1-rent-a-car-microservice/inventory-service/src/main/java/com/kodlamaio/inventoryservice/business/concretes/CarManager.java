@@ -2,6 +2,8 @@ package com.kodlamaio.inventoryservice.business.concretes;
 
 import com.kodlamaio.commonpackage.events.inventory.CarCreatedEvent;
 import com.kodlamaio.commonpackage.events.inventory.CarDeletedEvent;
+import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
+import com.kodlamaio.commonpackage.utils.exceptions.BusinessException;
 import com.kodlamaio.commonpackage.utils.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
@@ -28,6 +30,7 @@ public class CarManager implements CarService {
     private final ModelMapperService mapper;
     private final CarBusinessRules rules;
     private final KafkaProducer producer;
+
     @Override
     public List<GetAllCarsResponse> getAll() {
         var cars = repository.findAll();
@@ -77,16 +80,10 @@ public class CarManager implements CarService {
     }
 
     @Override
-    public void changeState(UUID carId, State state) {
-        var car = repository.findById(carId).orElseThrow();
-        car.setState(state);
-        repository.save(car);
-    }
-
-    @Override
-    public void checkIfCarAvailable(UUID id) {
-        rules.checkIfCarExistsById(id);
-        rules.checkCarAvailability(id);
+    public ClientResponse checkIfCarAvailable(UUID id) {
+        var response = new ClientResponse();
+        validateCarAvailability(id, response);
+        return response;
     }
 
     @Override
@@ -103,5 +100,16 @@ public class CarManager implements CarService {
 
     private void sendKafkaCarDeletedEvent(UUID id) {
         producer.sendMessage(new CarDeletedEvent(id), "car-deleted");
+    }
+
+    private void validateCarAvailability(UUID id, ClientResponse response) {
+        try {
+            rules.checkIfCarExistsById(id);
+            rules.checkCarAvailability(id);
+            response.setSuccess(true);
+        } catch (BusinessException exception) {
+            response.setSuccess(false);
+            response.setMessage(exception.getMessage());
+        }
     }
 }

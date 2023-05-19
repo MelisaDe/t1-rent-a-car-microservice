@@ -28,7 +28,6 @@ public class RentalManager implements RentalService {
     private final RentalRepository repository;
     private final ModelMapperService mapper;
     private final RentalBusinessRules rules;
-    private final CarClient carClient;
     private final KafkaProducer producer;
 
     @Override
@@ -53,7 +52,7 @@ public class RentalManager implements RentalService {
 
     @Override
     public CreateRentalResponse add(CreateRentalRequest request) {
-        carClient.checkIfCarAvailable(request.getCarId());
+        rules.ensureCarIsAvailable(request.getCarId());
         var rental = mapper.forRequest().map(request, Rental.class);
         rental.setId(null);
         rental.setTotalPrice(getTotalPrice(rental));

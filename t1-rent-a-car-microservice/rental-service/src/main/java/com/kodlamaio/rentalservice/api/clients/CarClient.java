@@ -1,13 +1,16 @@
 package com.kodlamaio.rentalservice.api.clients;
 
+import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.UUID;
 
-@FeignClient(name = "inventory-service")
+@FeignClient(name = "inventory-service", fallback = CarClientFallback.class)
 public interface CarClient {
     @GetMapping(value = "/api/cars/check-car-available/{carId}")
-    void checkIfCarAvailable(@PathVariable UUID carId);
+    @ResponseStatus(org.springframework.http.HttpStatus.OK)
+    ClientResponse checkIfCarAvailable(@PathVariable UUID carId);
 }
