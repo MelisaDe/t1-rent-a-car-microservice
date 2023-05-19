@@ -1,8 +1,7 @@
 package com.kodlamaio.inventoryservice.business.concretes;
 
-import com.kodlamaio.commonpackage.events.inventory.BrandDeletedEvent;
-import com.kodlamaio.commonpackage.events.inventory.CarDeletedEvent;
 import com.kodlamaio.commonpackage.events.inventory.ModelDeletedEvent;
+import com.kodlamaio.commonpackage.utils.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.ModelService;
 import com.kodlamaio.inventoryservice.business.dto.requests.create.CreateModelRequest;
@@ -13,11 +12,8 @@ import com.kodlamaio.inventoryservice.business.dto.responses.get.GetModelRespons
 import com.kodlamaio.inventoryservice.business.dto.responses.update.UpdateModelResponse;
 import com.kodlamaio.inventoryservice.business.rules.ModelBusinessRules;
 import com.kodlamaio.inventoryservice.entities.Model;
-import com.kodlamaio.inventoryservice.kafka.producer.InventoryProducer;
-import com.kodlamaio.inventoryservice.repository.CarRepository;
 import com.kodlamaio.inventoryservice.repository.ModelRepository;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +25,7 @@ public class ModelManager implements ModelService {
     private final ModelRepository repository;
     private final ModelMapperService mapper;
     private final ModelBusinessRules rules;
-    private final InventoryProducer producer;
+    private final KafkaProducer producer;
     @Override
     public List<GetAllModelsResponse> getAll() {
         var models = repository.findAll();
@@ -77,6 +73,6 @@ public class ModelManager implements ModelService {
     }
 
     private void sendKafkaModelDeletedEvent(UUID id) {
-        producer.sendMessage(new ModelDeletedEvent(id));
+        producer.sendMessage(new ModelDeletedEvent(id), "model-deleted");
     }
 }

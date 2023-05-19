@@ -2,6 +2,7 @@ package com.kodlamaio.inventoryservice.business.concretes;
 
 import com.kodlamaio.commonpackage.events.inventory.CarCreatedEvent;
 import com.kodlamaio.commonpackage.events.inventory.CarDeletedEvent;
+import com.kodlamaio.commonpackage.utils.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
 import com.kodlamaio.inventoryservice.business.dto.requests.create.CreateCarRequest;
@@ -13,7 +14,6 @@ import com.kodlamaio.inventoryservice.business.dto.responses.update.UpdateCarRes
 import com.kodlamaio.inventoryservice.business.rules.CarBusinessRules;
 import com.kodlamaio.inventoryservice.entities.Car;
 import com.kodlamaio.inventoryservice.entities.enums.State;
-import com.kodlamaio.inventoryservice.kafka.producer.InventoryProducer;
 import com.kodlamaio.inventoryservice.repository.CarRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class CarManager implements CarService {
     private final CarRepository repository;
     private final ModelMapperService mapper;
     private final CarBusinessRules rules;
-    private final InventoryProducer producer;
+    private final KafkaProducer producer;
     @Override
     public List<GetAllCarsResponse> getAll() {
         var cars = repository.findAll();
@@ -98,10 +98,10 @@ public class CarManager implements CarService {
     private void sendKafkaCarCreatedEvent(Car createdCar) {
         //asenkron olan kısım burası, buradan hata gelip gelmediğini beklemeden devam eder
         var event = mapper.forResponse().map(createdCar, CarCreatedEvent.class);
-        producer.sendMessage(event);
+        producer.sendMessage(event, "car-created");
     }
 
     private void sendKafkaCarDeletedEvent(UUID id) {
-        producer.sendMessage(new CarDeletedEvent(id));
+        producer.sendMessage(new CarDeletedEvent(id), "car-deleted");
     }
 }
