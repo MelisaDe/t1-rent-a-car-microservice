@@ -53,4 +53,8 @@ public class CarsController {
     public ClientResponse chechIfCarAvailable(@PathVariable UUID id) {
         return service.checkIfCarAvailable(id);
     }
+    @GetMapping("/check-car-available-for-maintenance/{id}")
+    public ClientResponse checkIfCarAvailableForMaintenance(@PathVariable UUID id) {
+        return service.checkIfCarAvailableForMaintenance(id);
+    }
 }

@@ -43,7 +43,7 @@ public class CarManager implements CarService {
 
     @Override
     public GetCarResponse getById(UUID id) {
-        rules.checkIfCarExistsById(id);
+        rules.checkIfCarExists(id);
         var car = repository.findById(id).orElseThrow();
         var response = mapper.forResponse().map(car, GetCarResponse.class);
         return response;
@@ -64,7 +64,7 @@ public class CarManager implements CarService {
 
     @Override
     public UpdateCarResponse update(UUID id, UpdateCarRequest request) {
-        rules.checkIfCarExistsById(id);
+        rules.checkIfCarExists(id);
         var car = mapper.forResponse().map(request, Car.class);
         car.setId(id);
         repository.save(car);
@@ -74,7 +74,7 @@ public class CarManager implements CarService {
 
     @Override
     public void delete(UUID id) {
-        rules.checkIfCarExistsById(id);
+        rules.checkIfCarExists(id);
         repository.deleteById(id);
         sendKafkaCarDeletedEvent(id);
     }
@@ -87,8 +87,15 @@ public class CarManager implements CarService {
     }
 
     @Override
+    public ClientResponse checkIfCarAvailableForMaintenance(UUID id) {
+        var response = new ClientResponse();
+        validateCarAvailabilityForMaintenance(id, response);
+        return response;
+    }
+
+    @Override
     public void changeStateByCarId(State state, UUID id) {
-        rules.checkIfCarExistsById(id);
+        rules.checkIfCarExists(id);
         repository.changeStateByCarId(state, id);
     }
 
@@ -104,8 +111,20 @@ public class CarManager implements CarService {
 
     private void validateCarAvailability(UUID id, ClientResponse response) {
         try {
-            rules.checkIfCarExistsById(id);
+            rules.checkIfCarExists(id);
             rules.checkCarAvailability(id);
+            response.setSuccess(true);
+        } catch (BusinessException exception) {
+            response.setSuccess(false);
+            response.setMessage(exception.getMessage());
+        }
+    }
+
+    private void validateCarAvailabilityForMaintenance(UUID id, ClientResponse response) {
+        try {
+            rules.checkIfCarExists(id);
+            rules.checkIfCarUnderMaintenance(id);
+            rules.checkIfCarRented(id);
             response.setSuccess(true);
         } catch (BusinessException exception) {
             response.setSuccess(false);
