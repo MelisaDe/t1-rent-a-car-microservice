@@ -1,7 +1,9 @@
 package com.kodlamaio.rentalservice.business.rules;
 
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.commonpackage.utils.exceptions.BusinessException;
 import com.kodlamaio.rentalservice.api.clients.CarClient;
+import com.kodlamaio.rentalservice.api.clients.PaymentClient;
 import com.kodlamaio.rentalservice.repository.RentalRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,12 +14,21 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RentalBusinessRules {
     private final RentalRepository repository;
-    private final CarClient client;
+    private final CarClient carClient;
+    private final PaymentClient paymentClient;
+
     public void checkIfRentalExists(UUID id) {
         if (!repository.existsById(id)) throw new BusinessException("Rental Not Exists");
     }
     public void ensureCarIsAvailable(UUID carId) {
-        var response = client.checkIfCarAvailable(carId);
+        var response = carClient.checkIfCarAvailable(carId);
         if (!response.isSuccess()) throw new BusinessException(response.getMessage());
+    }
+
+    public void ensurePaymentValid(CreateRentalPaymentRequest request){
+        var response= paymentClient.paymentValidation(request);
+        if (!response.isSuccess()){
+            throw new BusinessException(response.getMessage());
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.kodlamaio.filterservice.business.kafka.consumer;
 
+import com.kodlamaio.commonpackage.events.maintenance.MaintenanceCompletedChangeEvent;
 import com.kodlamaio.commonpackage.events.maintenance.MaintenanceCreatedEvent;
 import com.kodlamaio.commonpackage.events.maintenance.MaintenanceDeletedEvent;
 import com.kodlamaio.commonpackage.events.rental.RentalCreatedEvent;
@@ -36,5 +37,16 @@ public class MaintenanceConsumer {
         filter.setState("Avaılable");
         service.add(filter);
         log.info("Maintenance deleted event consumed {}", event);
+    }
+
+    @KafkaListener(
+            topics = "maintenance-completed-changed",
+            groupId = "filter-maintenance-completed-change"
+    )
+    public void consume(MaintenanceCompletedChangeEvent event) {
+        var filter = service.getByCarId(event.getCarId());
+        filter.setState("Avaılable");
+        service.add(filter);
+        log.info("Maintenance completed change event consumed {}", event);
     }
 }
