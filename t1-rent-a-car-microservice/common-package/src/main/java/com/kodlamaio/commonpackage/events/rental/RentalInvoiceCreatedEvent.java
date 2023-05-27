@@ -1,11 +1,11 @@
-package com.kodlamaio.rentalservice.business.dto.response;
+package com.kodlamaio.commonpackage.events.rental;
 
+import com.kodlamaio.commonpackage.events.Event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,9 +13,12 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateRentalResponse {
-    private UUID id;
-    private UUID carId;
+public class RentalInvoiceCreatedEvent implements Event {
+    private String cardHolder;
+    private String modelName;
+    private String brandName;
+    private String plate;
+    private int modelYear;
     private double dailyPrice;
     private double totalPrice;
     private int rentedForDays;

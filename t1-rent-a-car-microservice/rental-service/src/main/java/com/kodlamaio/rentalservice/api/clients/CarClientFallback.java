@@ -1,5 +1,6 @@
 package com.kodlamaio.rentalservice.api.clients;
 
+import com.kodlamaio.commonpackage.events.inventory.CarCreatedEvent;
 import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -15,5 +16,10 @@ public class CarClientFallback implements CarClient{
     public ClientResponse checkIfCarAvailable(UUID carId) {
         log.info("CAR SERVICE IS DOWN");
         throw new RuntimeException("INVENTORY SERVICE IS DOWN");
+    }
+    @Override
+    public CarCreatedEvent getByIdForRental(UUID carId) {
+        log.info("INVENTORY SERVICE IS DOWN!");
+        throw new RuntimeException("INVENTORY SERVICE IS DOWN!");
     }
 }

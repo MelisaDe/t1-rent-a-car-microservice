@@ -99,6 +99,15 @@ public class CarManager implements CarService {
         repository.changeStateByCarId(state, id);
     }
 
+    @Override
+    public CarCreatedEvent getByIdForRental(UUID id) {
+        rules.checkIfCarExists(id);
+        var car = repository.findById(id).orElseThrow();
+        var response = mapper.forResponse().map(car, CarCreatedEvent.class);
+
+        return response;
+    }
+
     private void sendKafkaCarCreatedEvent(Car createdCar) {
         //asenkron olan kısım burası, buradan hata gelip gelmediğini beklemeden devam eder
         var event = mapper.forResponse().map(createdCar, CarCreatedEvent.class);
