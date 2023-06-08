@@ -1,6 +1,7 @@
 package com.kodlamaio.inventoryservice.api.controllers;
 
 import com.kodlamaio.commonpackage.events.inventory.CarCreatedEvent;
+import com.kodlamaio.commonpackage.utils.constants.Roles;
 import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
 import com.kodlamaio.inventoryservice.business.dto.requests.create.CreateCarRequest;
@@ -12,6 +13,9 @@ import com.kodlamaio.inventoryservice.business.dto.responses.update.UpdateCarRes
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,11 +28,13 @@ public class CarsController {
     private final CarService service;
 
     @GetMapping
-    public List<GetAllCarsResponse> findAll(){
+    @PreAuthorize(Roles.AdminOrModerator)
+    public List<GetAllCarsResponse> findAll() {
         return service.getAll();
     }
 
     @GetMapping("/{id}")
+    @PostAuthorize(Roles.AdminOrModerator)
     public GetCarResponse findCarById(@PathVariable UUID id) {
         return service.getById(id);
     }
@@ -40,8 +46,8 @@ public class CarsController {
     }
 
     @PutMapping("/{id}")
-    public UpdateCarResponse update(@PathVariable UUID id, @RequestBody UpdateCarRequest request){
-        return  service.update(id, request);
+    public UpdateCarResponse update(@PathVariable UUID id, @RequestBody UpdateCarRequest request) {
+        return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
@@ -54,6 +60,7 @@ public class CarsController {
     public ClientResponse chechIfCarAvailable(@PathVariable UUID id) {
         return service.checkIfCarAvailable(id);
     }
+
     @GetMapping("/check-car-available-for-maintenance/{id}")
     public ClientResponse checkIfCarAvailableForMaintenance(@PathVariable UUID id) {
         return service.checkIfCarAvailableForMaintenance(id);
