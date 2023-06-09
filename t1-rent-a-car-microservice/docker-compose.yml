@@ -20,6 +20,36 @@ services:
     volumes:
       - .:/opt/jboss/keycloak/imports
 
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin-t1
+    ports:
+      - "9411:9411"
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus-t1
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitor-net
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-t1
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - grafana_config:/etc/grafana
+    networks:
+      - monitor-net
+
   mongodb_filter:
     container_name: turkcell-filterdb
     image: mongo
@@ -51,7 +81,13 @@ services:
     volumes:
       - mysqldb_data:/data/db
 volumes:
+  grafana_config:
+  grafana_data:
   kafka_data:
   mongodb_filter_data:
   mongodb_invoice_data:
   mysqldb_data:
+
+networks:
+ monitor-net:
+  driver: bridge
